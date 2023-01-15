@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure
+	xmlns="urn:jboss:deployment-structure:1.2">
+	<deployment>
+		<exclude-subsystems>
+			<subsystem name="logging" />
+			<subsystem name="jaxrs" />
+			<subsystem name="webservices" />
+		</exclude-subsystems>
+		<exclusions>
+			<module name="org.slf4j" />
+			<module name="org.slf4j.impl" />
+			<module name="org.slf4j.jcl-over-slf4j" />
+			<module name="org.apache.log4j" />
+			<module name="org.apache.commons.logging" />
+		</exclusions>
+	</deployment>
+</jboss-deployment-structure>
