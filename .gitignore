@@ -1,18 +1,18 @@
 ### Eclipse ###
 .metadata
-bin/
-tmp/
+**/bin/
+**/tmp/
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
-.settings/
+**/.settings/
 .loadpath
 .recommenders
 
 # External tool builders
-.externalToolBuilders/
+**/.externalToolBuilders/
 
 # Locally stored "Eclipse launch configurations"
 *.launch
@@ -24,11 +24,11 @@ local.properties
 .springBeans
 
 # Annotation Processing
-.apt_generated/
-.apt_generated_test/
+**/.apt_generated/
+**/.apt_generated_test/
 
 # Spring Boot Tooling
-.sts4-cache/
+**/.sts4-cache/
 
 ### Java ###
 # Compiled class file
@@ -46,4 +46,9 @@ local.properties
 *.tar.gz
 *.rar
 
+# Gradle files
+.gradle
+gradlew
+gradlew.bat
+**/gradle/
 **/build/
