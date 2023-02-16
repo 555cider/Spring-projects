@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: gateway
+  profiles:
+    active: dev
   cloud:
     gateway:
       httpclient:
