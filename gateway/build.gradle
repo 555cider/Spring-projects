@@ -20,12 +20,25 @@ ext {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client' // Eureka
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security' // disable CSRF protection
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive' // Redis
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5' // encrypt configurations
+	testImplementation(platform('org.junit:junit-bom:5.9.2'))
+	testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+
+    testLogging {
+        events "passed"
     }
 }
