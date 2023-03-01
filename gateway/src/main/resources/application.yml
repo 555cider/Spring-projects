@@ -15,7 +15,7 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: ENC(X+Xlz7h/5WuUTK+GA8+I06jvKcPvG06XkCAXdXsQsaFoLioSVw==)
+      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
 
 eureka:
   instance:
