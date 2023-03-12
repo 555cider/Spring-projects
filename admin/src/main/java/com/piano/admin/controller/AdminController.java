@@ -26,8 +26,10 @@ public class AdminController {
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> index() {
 	logger.info("=== === === Entered AdminController");
-	return Mono.just("Ha!! Ha!! Ha!!") //
-		.map(ResponseEntity::ok) //
+	String responseBody = "Ha!! Ha!! Ha!!";
+	return Mono.just(ResponseEntity.ok() //
+		.header("custom-header2", "Added in adminController") //
+		.body(responseBody)) //
 		.onErrorMap(e -> {
 		    if (e instanceof GlobalException) {
 			return new GlobalException("951", messageSource.getMessage("error.951", null, null));
