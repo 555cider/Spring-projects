@@ -17,6 +17,7 @@ public class AuthService {
 
     public Mono<Auth> get(@NotBlank String hashKey) {
 	return ops.opsForValue().get(key + hashKey);
+
     }
 
     public Mono<Long> post(Auth auth) {

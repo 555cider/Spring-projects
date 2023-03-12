@@ -1,13 +1,12 @@
 package com.piano.gateway.auth;
 
-import java.io.Serializable;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-@SuppressWarnings("serial")
+import com.piano.gateway.common.BaseResponse;
+
 @RedisHash(value = "auth")
-public class Auth implements Serializable {
+public class Auth extends BaseResponse {
 
     @Id
     private String id;
