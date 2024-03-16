@@ -8,6 +8,46 @@ spring:
     active: dev
   cloud:
     gateway:
+      # https://cloud.spring.io/spring-cloud-gateway/reference/html/
+      routes:
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - name: Path
+              args:
+                patterns: /admin/**
+          filters:
+            - name: RewritePath
+              args:
+                regexp: /admin/?(?<segment>.*)
+                replacement: /$\{segment}
+            - name: RequestSize
+              args:
+                maxSize: 5000000
+            - name: LoggingGatewayFilter
+              args:
+                preLogger: true
+                postLogger: true
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter:
+                  replenishRate: 1
+                  burstCapacity: 1
+                  requestedTokens: 1
+                # key-resolver: "#{@myKeyResolver}"
+          metadata:
+            response-timeout: 200
+            connect-timeout: 200
+      redis-rate-limiter:
+        include-headers: false
+      x-forwarded:
+        for-enabled: false
+        host-enabled: false
+        port-enabled: false
+        proto-enabled: false
+        prefix-enabled: false
+      loadbalancer:
+        use404: true
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s
@@ -15,7 +55,8 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
+      database: 0
+#      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
 
 eureka:
   instance:
