@@ -1,12 +1,6 @@
 server:
   port: 8761
 
-spring:
-  application:
-    name: discovery
-  profiles:
-    active: dev
-
 eureka:
   instance:
     hostname: localhost
@@ -15,3 +9,9 @@ eureka:
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+
+spring:
+  application:
+    name: discovery
+  profiles:
+    active: dev

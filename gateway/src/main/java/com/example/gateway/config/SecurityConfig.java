@@ -12,10 +12,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityWebFilterChain filterChain(ServerHttpSecurity http) throws Exception {
-        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
-        return http.build();
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable).build();
     }
-
-    // csrf: https://docs.spring.io/spring-security/reference/reactive/exploits/csrf.html
 
 }

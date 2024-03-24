@@ -1,4 +1,4 @@
-package com.example.gateway.common;
+package com.example.auth.common;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
