@@ -1,8 +1,8 @@
-package com.example.auth.model;
+package com.example.auth.api;
 
 import com.example.auth.common.BaseResponse;
 
-public class LoginResponse extends BaseResponse {
+class LoginResponse extends BaseResponse {
 
     private Long id;
 

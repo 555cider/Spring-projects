@@ -9,19 +9,20 @@ repositories {
     mavenCentral()
 }
 
-val springBootVersion = "3.2.3"
-val springCloudVersion = "4.1.0"
-val postgresqlVersion = "42.7.3"
+val springBootVersion = "3.2.4"
+val springCloudVersion = "4.1.1"
+val r2dbcPostgresqlVersion = "1.0.4.RELEASE"
 
 dependencies {
     // Eureka Client
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$springCloudVersion")
+
     // Web
     implementation("org.springframework.boot:spring-boot-starter-webflux:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-validation:$springBootVersion")
 
-    // JPA
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion")
-    // PostgreSQL
-    implementation("org.postgresql:postgresql:${postgresqlVersion}")
+    // R2DBC
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springBootVersion")
+    // R2DBC Postgresql
+    implementation("org.postgresql:r2dbc-postgresql:${r2dbcPostgresqlVersion}")
 }

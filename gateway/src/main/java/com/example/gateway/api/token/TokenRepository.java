@@ -1,7 +1,7 @@
 package com.example.gateway.api.token;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 
-public interface TokenRepository extends JpaRepository<Token, Long> {
+public interface TokenRepository extends R2dbcRepository<Token, Long> {
 
 }

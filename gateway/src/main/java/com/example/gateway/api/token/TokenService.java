@@ -33,16 +33,18 @@ public class TokenService {
     protected Mono<TokenResponse> createToken(@NotBlank TokenRequest loginRequest) {
         return apiUtil
                 .postLogin(TypeUtil.toMap(loginRequest))
-                .switchIfEmpty(Mono.error(() -> new GlobalException("952", null)))
-                .flatMap(data -> {
-                    try {
-                        String refreshToken = tokenRepository.findById(TypeUtil.toLong(((Map<String, Object>) data).get("id"), 0)).orElseThrow().getRefreshToken().toString();
-                        String accessToken = jwtUtil.generateAccessToken(refreshToken);
-                        return Mono.just(new TokenResponse(refreshToken, accessToken));
-                    } catch (Exception e) {
-                        return Mono.error(e);
-                    }
-                });
+                .onErrorMap(e -> new GlobalException("952", e.getMessage()))
+                .doOnNext(loginResponse -> logger.info("loginResponse = {}", loginResponse))
+                .flatMap(loginResponse -> tokenRepository
+                        .findById(TypeUtil.toLong(((Map<String, Object>) loginResponse).get("id"), 0))
+                        .cache())
+                .onErrorMap(e -> new GlobalException("952", e.getMessage()))
+                .map(token -> {
+                    String refreshToken = TypeUtil.toString(token.refreshToken(), "");
+                    String accessToken = jwtUtil.generateAccessToken(refreshToken);
+                    return new TokenResponse(refreshToken, accessToken);
+                })
+                .onErrorMap(e -> new GlobalException("952", e.getMessage()));
     }
 
 }

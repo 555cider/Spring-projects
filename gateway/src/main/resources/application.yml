@@ -62,21 +62,18 @@ spring:
       database: 0
       #      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
       time-to-live: 3600000
-  datasource:
-    url: jdbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
     username: my
     password: 1234
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        default-schema: temp
-        connection:
-          character-encoding: UTF-8
-          use-unicode: true
+      schema: temp
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 60000
+      max-lifetime: 180000
+      max-create-connection-time: 2s
   security:
     user:
       password: 1234

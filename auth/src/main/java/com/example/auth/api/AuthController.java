@@ -1,9 +1,6 @@
-package com.example.auth.controller;
+package com.example.auth.api;
 
 import com.example.auth.common.GlobalException;
-import com.example.auth.model.LoginRequest;
-import com.example.auth.model.LoginResponse;
-import com.example.auth.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -13,11 +10,11 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping(value = "/auth")
-public class AuthController {
+class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    AuthService authService;
+    private final AuthService authService;
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -31,12 +28,12 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login")
-    public Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginRequest loginRequest) throws GlobalException {
+    public Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginRequest loginRequest) {
         logger.info("loginRequest = {}", loginRequest);
         return authService.login(loginRequest)
+                .doOnNext(loginResponse -> logger.info("loginResponse = {}", loginResponse))
                 .map(ResponseEntity::ok)
-                .onErrorMap(e -> new GlobalException("951", e.getMessage()))
-                .doOnNext(loginResponse -> logger.info("loginResponse = {}", loginResponse));
+                .onErrorMap(e -> new GlobalException("951", e.getMessage()));
     }
 
 }

@@ -1,5 +1,9 @@
 server:
   port: 8082
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
 
 eureka:
   instance:
@@ -17,21 +21,15 @@ spring:
     active: dev
   messages:
     basename: messages
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
     username: my
     password: 1234
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        default-schema: temp
-        show-sql: true
-        connection:
-          character-encoding: UTF-8
-          use-unicode: true
+      schema: temp
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 60000
+      max-lifetime: 180000
+      max-create-connection-time: 2s

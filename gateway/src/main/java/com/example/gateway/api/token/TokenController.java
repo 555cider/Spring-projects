@@ -29,14 +29,14 @@ public class TokenController {
         this.tokenService = tokenService;
     }
 
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     public Mono<ResponseEntity<TokenResponse>> postToken(@RequestBody TokenRequest tokenRequest) {
         logger.info("tokenRequest = {}", tokenRequest);
         return tokenService
                 .createToken(tokenRequest)
+                .doOnNext(tokenResponse -> logger.info("tokenResponse = {}", tokenResponse))
                 .map(ResponseEntity::ok)
-                .onErrorMap(e -> new GlobalException("952", messageSource.getMessage("error.952", null, Locale.getDefault())))
-                .doOnNext(tokenResponse -> logger.info("tokenResponse = {}", tokenResponse));
+                .onErrorMap(e -> new GlobalException("952", messageSource.getMessage("error.952", null, Locale.getDefault())));
     }
 
 }
