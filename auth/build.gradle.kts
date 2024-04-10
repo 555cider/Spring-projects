@@ -25,4 +25,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springBootVersion")
     // R2DBC Postgresql
     implementation("org.postgresql:r2dbc-postgresql:${r2dbcPostgresqlVersion}")
+
+    // Test
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation("io.projectreactor:reactor-test:3.6.4")
+    testImplementation("com.google.code.gson:gson:2.8.9")
 }
