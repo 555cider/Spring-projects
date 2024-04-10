@@ -23,11 +23,17 @@ class AuthService {
     public Mono<LoginResponse> login(LoginRequest loginRequest) {
         return authRepository
                 .findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
-                .switchIfEmpty(Mono.error(new GlobalException("952", "Invalid email or password")))
+                .switchIfEmpty(Mono.error(new GlobalException("9952", "Invalid email or password")))
                 .cache()
                 .flatMap(auth -> tokenRepository.saveWithAuthId(auth.id()))
                 .map(LoginResponse::new)
-                .onErrorMap(e -> new GlobalException("952", e.getMessage()));
+                .onErrorMap(e -> {
+                    logger.error("login error = {}", e.getLocalizedMessage());
+                    if (e instanceof GlobalException) {
+                        return e;
+                    }
+                    return new GlobalException("9951", e.getMessage());
+                });
     }
 
 }

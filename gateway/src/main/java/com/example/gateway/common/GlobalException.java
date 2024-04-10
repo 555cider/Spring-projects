@@ -1,11 +1,6 @@
 package com.example.gateway.common;
 
-import java.io.Serial;
-
-public class GlobalException extends Exception {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class GlobalException extends Throwable {
 
     private String code;
 
@@ -13,9 +8,18 @@ public class GlobalException extends Exception {
 
     private Exception exception;
 
+    public GlobalException(String code) {
+        this.code = code;
+    }
+
     public GlobalException(String code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    public GlobalException(String code, Exception exception) {
+        this.code = code;
+        this.exception = exception;
     }
 
     public GlobalException(String code, String message, Exception exception) {
@@ -28,24 +32,12 @@ public class GlobalException extends Exception {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public Exception getException() {
         return exception;
-    }
-
-    public void setException(Exception exception) {
-        this.exception = exception;
     }
 
 }

@@ -1,6 +1,5 @@
 package com.example.auth.api;
 
-import com.example.auth.common.GlobalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -23,8 +22,7 @@ class AuthController {
     @GetMapping(value = "ping", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> ping() {
         logger.info("ping");
-        return Mono.just(ResponseEntity.ok().body("pong"))
-                .onErrorMap(e -> new GlobalException("951", e.getMessage()));
+        return Mono.just(ResponseEntity.ok().body("pong"));
     }
 
     @PostMapping(value = "/login")
@@ -32,8 +30,7 @@ class AuthController {
         logger.info("loginRequest = {}", loginRequest);
         return authService.login(loginRequest)
                 .doOnNext(loginResponse -> logger.info("loginResponse = {}", loginResponse))
-                .map(ResponseEntity::ok)
-                .onErrorMap(e -> new GlobalException("951", e.getMessage()));
+                .map(ResponseEntity::ok);
     }
 
 }

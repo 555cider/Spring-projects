@@ -31,9 +31,9 @@ public class AuthController {
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
                     if (e instanceof GlobalException) {
-                        return new GlobalException("951", messageSource.getMessage("error.951", null, Locale.KOREAN));
+                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("951", e.getMessage());
+                    return new GlobalException("9951", e.getMessage());
                 });
     }
 
@@ -43,9 +43,9 @@ public class AuthController {
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
                     if (e instanceof GlobalException) {
-                        return new GlobalException("951", messageSource.getMessage("error.951", null, Locale.KOREAN));
+                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("951", e.getMessage());
+                    return new GlobalException("9951", e.getMessage());
                 });
     }
 
@@ -55,9 +55,9 @@ public class AuthController {
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
                     if (e instanceof GlobalException) {
-                        return new GlobalException("951", messageSource.getMessage("error.951", null, Locale.KOREAN));
+                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("951", e.getMessage());
+                    return new GlobalException("9951", e.getMessage());
                 });
     }
 

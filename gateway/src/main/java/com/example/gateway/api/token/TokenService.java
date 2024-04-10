@@ -30,21 +30,19 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    protected Mono<TokenResponse> createToken(@NotBlank TokenRequest loginRequest) {
+    protected Mono<TokenResponse> createToken(@NotBlank TokenRequest tokenRequest) {
         return apiUtil
-                .postLogin(TypeUtil.toMap(loginRequest))
-                .onErrorMap(e -> new GlobalException("952", e.getMessage()))
+                .postLogin(TypeUtil.toMap(tokenRequest))
                 .doOnNext(loginResponse -> logger.info("loginResponse = {}", loginResponse))
                 .flatMap(loginResponse -> tokenRepository
                         .findById(TypeUtil.toLong(((Map<String, Object>) loginResponse).get("id"), 0))
                         .cache())
-                .onErrorMap(e -> new GlobalException("952", e.getMessage()))
                 .map(token -> {
                     String refreshToken = TypeUtil.toString(token.refreshToken(), "");
                     String accessToken = jwtUtil.generateAccessToken(refreshToken);
                     return new TokenResponse(refreshToken, accessToken);
                 })
-                .onErrorMap(e -> new GlobalException("952", e.getMessage()));
+                .onErrorMap(e -> new GlobalException("9951", (Exception) e));
     }
 
 }

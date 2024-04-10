@@ -30,7 +30,7 @@ public class TokenRequest {
 
     @Override
     public String toString() {
-        return "LoginRequest [email=" + email + "]";
+        return "TokenRequest [email=" + email + "]";
     }
 
 }

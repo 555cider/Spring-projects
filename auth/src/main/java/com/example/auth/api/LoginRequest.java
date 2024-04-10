@@ -12,6 +12,14 @@ class LoginRequest {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
+    public LoginRequest() {
+    }
+
+    LoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }

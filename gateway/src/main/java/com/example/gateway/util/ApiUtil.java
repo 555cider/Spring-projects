@@ -34,6 +34,7 @@ public class ApiUtil {
                 .get()
                 .uri(url)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (GET " + url + "). Status code: " + clientResponse.statusCode().value())))
                 .bodyToMono(String.class);
     }
 
@@ -43,7 +44,7 @@ public class ApiUtil {
                 .uri(url)
                 .body(BodyInserters.fromValue(paramMap))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("error.951", null)))
+                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (POST " + url + "). Status code: " + clientResponse.statusCode().value())))
                 .bodyToMono(String.class)
                 .timeout(Duration.ofSeconds(5));
     }
@@ -54,10 +55,9 @@ public class ApiUtil {
                 .uri(authBaseUrl + "/login")
                 .body(BodyInserters.fromValue(paramMap))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("error.951", null)))
+                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (POST /login). Status code: " + clientResponse.statusCode().value())))
                 .bodyToMono(Object.class)
-//                .timeout(Duration.ofSeconds(5))
-                ;
+                .timeout(Duration.ofSeconds(5));
     }
 
 }

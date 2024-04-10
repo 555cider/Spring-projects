@@ -23,4 +23,12 @@ class LoginResponse extends BaseResponse {
         return "LoginResponse{ id=" + id + " }";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoginResponse that = (LoginResponse) o;
+        return id.equals(that.id);
+    }
+
 }

@@ -17,6 +17,11 @@ public class GlobalException extends Throwable {
         this.message = message;
     }
 
+    public GlobalException(String code, Exception exception) {
+        this.code = code;
+        this.exception = exception;
+    }
+
     public GlobalException(String code, String message, Exception exception) {
         this.code = code;
         this.message = message;
@@ -27,24 +32,12 @@ public class GlobalException extends Throwable {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public Exception getException() {
         return exception;
-    }
-
-    public void setException(Exception exception) {
-        this.exception = exception;
     }
 
 }

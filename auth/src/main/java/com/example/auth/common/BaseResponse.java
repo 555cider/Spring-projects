@@ -25,26 +25,22 @@ public class BaseResponse {
         this.message = message;
     }
 
-    public BaseResponse(String code, Locale locale) {
-        super();
-        this.code = code;
-        this.message = ResourceBundle.getBundle("messages", locale).getString(code);
-    }
-
     public String getCode() {
         return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public <T extends BaseResponse> T withCode(String code) {
+        this.code = code;
+        return (T) this;
+    }
+
+    public <T extends BaseResponse> T withMessage(String message) {
         this.message = message;
+        return (T) this;
     }
 
 }
