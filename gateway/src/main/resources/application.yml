@@ -86,7 +86,6 @@ service:
   jwt:
     secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
     access:
-      subject: access
       expiration: 3600000
   api:
     base-url:

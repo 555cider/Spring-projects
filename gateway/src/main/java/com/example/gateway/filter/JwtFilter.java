@@ -40,7 +40,7 @@ public class JwtFilter implements WebFilter {
 
         String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (token != null && token.startsWith(AUTH_HEADER_PREFIX)) {
-            if (jwtUtil.isValid(token.substring(7))) {
+            if (jwtUtil.isValidAccessToken(token.substring(7))) {
                 return chain.filter(exchange);
             }
 

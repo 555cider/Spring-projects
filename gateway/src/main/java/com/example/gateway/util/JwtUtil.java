@@ -17,11 +17,12 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
+    private static final String TOKEN_TYPE = "tokenType";
+
+    private static final String TOKEN_TYPE_ACCESS = "access";
+
     @Value("${spring.application.name}")
     private String ISSUER;
-
-    @Value("${service.jwt.access.subject}")
-    private String ACCESS_TOKEN_SUBJECT;
 
     // accessToken 만료 시간
     @Value("${service.jwt.access.expiration}")
@@ -40,24 +41,28 @@ public class JwtUtil {
 
     public String generateAccessToken(String refreshToken) {
         return Jwts.builder()
-                .subject(ACCESS_TOKEN_SUBJECT)
+                .header().type("JWT").and()
                 .issuer(ISSUER)
-                .issuedAt(new Date())
+                .subject(refreshToken)
                 .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_DURATION))
-                .claim("refreshToken", refreshToken)
+                .notBefore(new Date())
+                .issuedAt(new Date())
+                .claim(TOKEN_TYPE, TOKEN_TYPE_ACCESS)
                 .signWith(REFRESH_TOKEN_SECRET_KEY)
                 .compact();
     }
 
     // accessToken 유효성 검증
-    public boolean isValid(String accessToken) {
+    public boolean isValidAccessToken(String accessToken) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(REFRESH_TOKEN_SECRET_KEY).build()
                     .parseSignedClaims(accessToken).getPayload();
             return claims.getIssuer().equals(ISSUER)
-                    && claims.getSubject().equals(ACCESS_TOKEN_SUBJECT)
-                    && claims.getExpiration().after(new Date());
+                    && claims.getSubject() != null
+                    && claims.getExpiration().after(new Date())
+                    && claims.getNotBefore().before(new Date())
+                    && claims.get(TOKEN_TYPE).equals(TOKEN_TYPE_ACCESS);
         } catch (ExpiredJwtException ex) {
             logger.error("JWT expired", ex);
         } catch (IllegalArgumentException ex) {
