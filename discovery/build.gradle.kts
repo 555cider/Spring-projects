@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("org.springframework.boot") version "3.2.5"
 }
 
 group = "com.example"
@@ -9,8 +10,8 @@ repositories {
     mavenCentral()
 }
 
-val springCloudVersion by extra { "4.1.0" }
+val springCloudVersion = "4.1.1"
 
 dependencies {
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:$springCloudVersion")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:${springCloudVersion}")
 }

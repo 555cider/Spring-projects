@@ -1,3 +1,5 @@
+CREATE SCHEMA temp;
+
 CREATE TABLE temp.auth (
     id SERIAL primary key,
     email VARCHAR(255) NOT NULL,

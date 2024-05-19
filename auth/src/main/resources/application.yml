@@ -1,35 +1,73 @@
+# current
+spring:
+  profiles:
+    active: local
+
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
+    username: postgres
+    password: 1234
+    properties:
+      schema: temp
 server:
   port: 8082
-  shutdown: graceful
-  netty:
-    connection-timeout: 2s
-    idle-timeout: 15s
-
 eureka:
   instance:
     hostname: localhost
   client:
-    registerWithEureka: true
-    fetchRegistry: true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka
 
+---
+# dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?serverTimezone=Asia/Seoul
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    properties:
+      schema: ${POSTGRES_SCHEMA}
+server:
+  port: ${SERVICE_AUTH_PORT}
+eureka:
+  instance:
+    hostname: ${DISCOVERY_HOST}
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
+
+---
+# common
 spring:
   application:
     name: auth-service
-  profiles:
-    active: dev
   messages:
     basename: messages
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
-    username: my
-    password: 1234
-    properties:
-      schema: temp
     pool:
       initial-size: 5
       max-size: 10
       max-idle-time: 60000
       max-lifetime: 180000
       max-create-connection-time: 2s
+  sql:
+    init:
+      schema-locations: classpath:schema.sql
+server:
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true

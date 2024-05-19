@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database (https://hub.docker.com/_/postgres)
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT_DOCKER}"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  # Redis Cache
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT_DOCKER}"
+  # Service Discovery
+  discovery:
+    container_name: discovery
+    build: discovery
+    env_file:
+      - .env
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "${DISCOVERY_PORT}:${DISCOVERY_PORT_DOCKER}"
+  # API Gateway
+  gateway:
+    container_name: gateway
+    build: gateway
+    env_file:
+      - .env
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT_DOCKER}"
+    depends_on:
+      - discovery
+  # Auth Service
+  auth:
+    container_name: auth
+    build: auth
+    env_file:
+      - .env
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT_DOCKER}"
+    depends_on:
+      - discovery
+      - postgres
+volumes:
+  postgres-data:

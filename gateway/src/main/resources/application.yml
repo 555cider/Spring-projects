@@ -1,20 +1,90 @@
+# current
+spring:
+  profiles:
+    active: local
+
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      #      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
+    username: postgres
+    password: 1234
+    properties:
+      schema: temp
+    pool:
+      initial-size: 5
+      max-size: 10
+  security:
+    user:
+      password: 1234
 server:
   port: 8080
-
 eureka:
   instance:
     hostname: localhost
-  client:
-    register-with-eureka: true
-    fetch-registry: true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka
+service:
+  jwt:
+    secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
+  api:
+    base-url:
+      auth: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
 
+---
+# dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      #      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?serverTimezone=Asia/Seoul
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    properties:
+      schema: ${POSTGRES_SCHEMA}
+    pool:
+      initial-size: 5
+      max-size: 10
+  security:
+    user:
+      password: 1234
+server:
+  port: ${GATEWAY_PORT}
+eureka:
+  instance:
+    hostname: ${DISCOVERY_HOST}
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
+service:
+  jwt:
+    secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
+  api:
+    base-url:
+      auth: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
+
+---
+# common
 spring:
   application:
     name: gateway
-  profiles:
-    active: dev
   messages:
     basename: messages
   cloud:
@@ -57,36 +127,19 @@ spring:
         prefix-enabled: false
   data:
     redis:
-      host: localhost
-      port: 6379
-      database: 0
-      #      password: ENC(vs80g6g8RPF/BSJqw0ONpT7rvXgeri0SMZ/PszCK0O4V384HLZPICWdp) # redis-password
       time-to-live: 3600000
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
-    username: my
-    password: 1234
-    properties:
-      schema: temp
-    pool:
-      initial-size: 5
-      max-size: 10
       max-idle-time: 60000
       max-lifetime: 180000
       max-create-connection-time: 2s
-  security:
-    user:
-      password: 1234
-
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
 hibernate:
   cache:
     use-second-level-cache: true
-
 service:
   jwt:
-    secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
     access:
       expiration: 3600000
-  api:
-    base-url:
-      auth: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
