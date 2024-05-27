@@ -1,4 +1,4 @@
-package com.example.auth.api;
+package com.example.auth.token;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;

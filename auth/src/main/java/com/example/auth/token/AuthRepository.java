@@ -1,4 +1,4 @@
-package com.example.auth.api;
+package com.example.auth.token;
 
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Mono;

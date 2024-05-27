@@ -1,8 +1,7 @@
 package com.example.gateway.util;
 
-import com.example.gateway.common.GlobalException;
+import com.example.gateway.common.BaseException;
 import io.netty.channel.ChannelOption;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
@@ -21,41 +20,29 @@ public class ApiUtil {
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000)
             .responseTimeout(Duration.ofMillis(3000));
 
-    private final WebClient webClient = WebClient
+    private static final WebClient webClient = WebClient
             .builder()
             .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
 
-    @Value("${service.api.base-url.auth}")
-    private String authBaseUrl;
-
-    public Mono<String> callGetApi(String url) {
+    public static Mono<Object> callGetApi(String url) {
         return webClient
                 .get()
                 .uri(url)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (GET " + url + "). Status code: " + clientResponse.statusCode().value())))
-                .bodyToMono(String.class);
+                .onStatus(HttpStatusCode::isError, clientResponse ->
+                        Mono.error(new BaseException("9911").message("Call api error (GET " + url + "). Status code: " + clientResponse.statusCode().value())))
+                .bodyToMono(Object.class);
     }
 
-    public Mono<String> callPostApi(String url, Map<String, Object> paramMap) {
+    public static Mono<Object> callPostApi(String url, Map<String, Object> paramMap) {
         return webClient
                 .post()
                 .uri(url)
                 .body(BodyInserters.fromValue(paramMap))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (POST " + url + "). Status code: " + clientResponse.statusCode().value())))
-                .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(5));
-    }
-
-    public Mono<Object> postLogin(Map<String, Object> paramMap) {
-        return webClient
-                .post()
-                .uri(authBaseUrl + "/login")
-                .body(BodyInserters.fromValue(paramMap))
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> Mono.error(new GlobalException("9911", "Call api error (POST /login). Status code: " + clientResponse.statusCode().value())))
+                .onStatus(HttpStatusCode::isError, clientResponse ->
+                        Mono.error(new BaseException("9911").message("Call api error (POST " + url + "). Status code: " + clientResponse.statusCode().value())))
                 .bodyToMono(Object.class)
                 .timeout(Duration.ofSeconds(5));
     }

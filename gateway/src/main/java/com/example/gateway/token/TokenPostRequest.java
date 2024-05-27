@@ -1,9 +1,9 @@
-package com.example.auth.api;
+package com.example.gateway.token;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-class LoginRequest {
+public class TokenPostRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "유효한 이메일 주소를 입력해주세요.")
@@ -11,14 +11,6 @@ class LoginRequest {
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
-
-    public LoginRequest() {
-    }
-
-    LoginRequest(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
 
     public String getEmail() {
         return email;
@@ -30,7 +22,7 @@ class LoginRequest {
 
     @Override
     public String toString() {
-        return "LoginRequest [email=" + email + "]";
+        return "TokenRequest [email=" + email + "]";
     }
 
 }

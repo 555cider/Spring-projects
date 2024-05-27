@@ -32,7 +32,7 @@ public class LogFilter extends AbstractGatewayFilterFactory<LogFilter.Config> {
                         , exchange.getRequest().getPath()
                         , exchange.getResponse().getStatusCode());
             }));
-        }); //우선순위
+        });
     }
 
     public static class Config {

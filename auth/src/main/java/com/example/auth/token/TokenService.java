@@ -1,4 +1,4 @@
-package com.example.auth.api;
+package com.example.auth.token;
 
 import com.example.auth.common.GlobalException;
 import org.slf4j.Logger;
@@ -7,31 +7,28 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-class AuthService {
+class TokenService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     private final AuthRepository authRepository;
 
     private final TokenRepository tokenRepository;
 
-    public AuthService(AuthRepository authRepository, TokenRepository tokenRepository) {
+    public TokenService(AuthRepository authRepository, TokenRepository tokenRepository) {
         this.authRepository = authRepository;
         this.tokenRepository = tokenRepository;
     }
 
-    public Mono<LoginResponse> login(LoginRequest loginRequest) {
+    public Mono<CreateTokenResponse> createToken(CreateTokenRequest createTokenRequest) {
         return authRepository
-                .findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
+                .findByEmailAndPassword(createTokenRequest.getEmail(), createTokenRequest.getPassword())
                 .switchIfEmpty(Mono.error(new GlobalException("9952", "Invalid email or password")))
                 .cache()
                 .flatMap(auth -> tokenRepository.saveWithAuthId(auth.id()))
-                .map(LoginResponse::new)
+                .map(CreateTokenResponse::new)
                 .onErrorMap(e -> {
-                    logger.error("login error = {}", e.getLocalizedMessage());
-                    if (e instanceof GlobalException) {
-                        return e;
-                    }
+                    logger.error("error = {}", e.getLocalizedMessage());
                     return new GlobalException("9951", e.getMessage());
                 });
     }

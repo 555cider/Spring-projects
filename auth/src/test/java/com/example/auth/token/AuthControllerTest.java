@@ -1,4 +1,4 @@
-package com.example.auth.api;
+package com.example.auth.token;
 
 import com.example.auth.common.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +14,13 @@ import reactor.core.publisher.Mono;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(AuthController.class)
+@WebFluxTest(TokenController.class)
 class AuthControllerTest {
 
     private WebTestClient webTestClient;
 
     @MockBean
-    private AuthService authService;
+    private TokenService tokenService;
 
     @BeforeEach
     void setup() {
@@ -30,37 +30,37 @@ class AuthControllerTest {
     @Test
     void login_InvalidCredentials_ThrowsGlobalException() {
 
-        LoginRequest loginRequest = new LoginRequest("invalid@example.com", "wrongpassword");
-        LoginResponse loginResponse = new LoginResponse().withCode("9952").withMessage("Invalid email or password");
+        CreateTokenRequest loginRequest = new CreateTokenRequest("invalid@example.com", "wrongpassword");
+        CreateTokenResponse tokenPostResponse = new CreateTokenResponse().withCode("9952").withMessage("Invalid email or password");
 
-        when(this.authService.login(loginRequest)).thenReturn(Mono.error(new GlobalException("9952", "Invalid email or password")));
+        when(this.tokenService.createToken(loginRequest)).thenReturn(Mono.error(new GlobalException("9952", "Invalid email or password")));
 
         this.webTestClient
                 .post().uri("/auth/login")
                 .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(loginRequest), LoginRequest.class)
+                .body(Mono.just(loginRequest), CreateTokenRequest.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.id").isEmpty()
-                .jsonPath("$.code").isEqualTo(loginResponse.getCode())
-                .jsonPath("$.message").isEqualTo(loginResponse.getMessage());
+                .jsonPath("$.code").isEqualTo(tokenPostResponse.getCode())
+                .jsonPath("$.message").isEqualTo(tokenPostResponse.getMessage());
 
     }
 
     @Test()
     void login_ValidCredentials_ReturnsLoginResponse() {
 
-        LoginRequest loginRequest = new LoginRequest("test1@example.com", "password1");
-        LoginResponse loginResponse = new LoginResponse(1L);
+        CreateTokenRequest loginRequest = new CreateTokenRequest("test1@example.com", "password1");
+        CreateTokenResponse tokenPostResponse = new CreateTokenResponse(1L);
 
-        when(this.authService.login(loginRequest)).thenReturn(Mono.just(loginResponse));
+        when(this.tokenService.createToken(loginRequest)).thenReturn(Mono.just(tokenPostResponse));
 
         this.webTestClient
                 .post().uri("/auth/login")
                 .accept(MediaType.APPLICATION_JSON)
-                .body(Mono.just(loginRequest), LoginRequest.class)
+                .body(Mono.just(loginRequest), CreateTokenRequest.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)

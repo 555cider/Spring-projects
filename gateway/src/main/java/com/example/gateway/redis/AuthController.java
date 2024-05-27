@@ -1,6 +1,6 @@
 package com.example.gateway.redis;
 
-import com.example.gateway.common.GlobalException;
+import com.example.gateway.common.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +30,10 @@ public class AuthController {
         return authService.get(hashKey)
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
-                    if (e instanceof GlobalException) {
-                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
+                    if (e instanceof BaseException) {
+                        return new BaseException("9951").message(messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("9951", e.getMessage());
+                    return new BaseException("9951").message(e.getMessage());
                 });
     }
 
@@ -42,10 +42,10 @@ public class AuthController {
         return this.authService.post(auth)
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
-                    if (e instanceof GlobalException) {
-                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
+                    if (e instanceof BaseException) {
+                        return new BaseException("9951").message(messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("9951", e.getMessage());
+                    return new BaseException("9951").message(e.getMessage());
                 });
     }
 
@@ -54,10 +54,10 @@ public class AuthController {
         return this.authService.delete(auth)
                 .map(ResponseEntity::ok)
                 .onErrorMap(e -> {
-                    if (e instanceof GlobalException) {
-                        return new GlobalException("9951", messageSource.getMessage("9951", null, Locale.KOREAN));
+                    if (e instanceof BaseException) {
+                        return new BaseException("9951").message(messageSource.getMessage("9951", null, Locale.KOREAN));
                     }
-                    return new GlobalException("9951", e.getMessage());
+                    return new BaseException("9951").message(e.getMessage());
                 });
     }
 

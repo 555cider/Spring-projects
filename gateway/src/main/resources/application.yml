@@ -36,10 +36,11 @@ eureka:
       defaultZone: http://${eureka.instance.hostname}:8761/eureka
 service:
   jwt:
-    secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
+    private-key: keys/jwt-private_pkcs8.pem
+    public-key: keys/jwt-public.pem
   api:
-    base-url:
-      auth: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
+    auth:
+      base-path: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
 
 ---
 # dev
@@ -75,10 +76,11 @@ eureka:
       defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
 service:
   jwt:
-    secret-key: U7cCRvJM16pFZ-vyWj3Z3liUfymmiNazsB7fCr8Bas8
+    private-key: keys/jwt-private_pkcs8.pem
+    public-key: keys/jwt-public.pem
   api:
-    base-url:
-      auth: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
+    auth:
+      base-path: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
 
 ---
 # common
@@ -92,14 +94,11 @@ spring:
       default-filters:
         - name: LogFilter
       routes:
-        - id: auth-service
+        - id: auth_service_route
           uri: lb://AUTH-SERVICE
           predicates:
-            - name: Path
-              args:
-                patterns: /auth/**
+            - Path=/auth/**
           filters:
-            - name: LogFilter
             - name: RewritePath
               args:
                 regexp: /auth/?(?<segment>.*)
@@ -141,5 +140,5 @@ hibernate:
     use-second-level-cache: true
 service:
   jwt:
-    access:
-      expiration: 3600000
+    access-expiration: 3600000
+    skip-path-regex: .*/public/.*, ^/login$, ^/token$

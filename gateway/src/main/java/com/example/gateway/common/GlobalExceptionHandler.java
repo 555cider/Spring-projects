@@ -16,15 +16,18 @@ public class GlobalExceptionHandler {
     @Autowired
     private MessageSource messageSource;
 
-    @ExceptionHandler(GlobalException.class)
-    public ResponseEntity<BaseResponse> handleGlobalException(GlobalException ex, Locale locale) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<BaseResponse> handleGlobalException(BaseException ex, Locale locale) {
+        if (locale == null) {
+            locale = Locale.getDefault();
+        }
         String message;
         if (ex.getMessage() == null || "".equals(ex.getMessage())) {
             message = messageSource.getMessage(ex.getCode(), null, locale);
         } else {
             message = ex.getLocalizedMessage();
         }
-        return ResponseEntity.ok().body(new BaseResponse(ex.getCode(), message));
+        return ResponseEntity.ok().body(new BaseResponse().code(ex.getCode()).message(message));
     }
 
 }

@@ -59,9 +59,6 @@ spring:
       max-idle-time: 60000
       max-lifetime: 180000
       max-create-connection-time: 2s
-  sql:
-    init:
-      schema-locations: classpath:schema.sql
 server:
   shutdown: graceful
   netty:

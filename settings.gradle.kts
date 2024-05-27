@@ -12,7 +12,7 @@ plugins {
 }
 
 // defines your project name
-rootProject.name = "spring-infra"
+rootProject.name = "spring-projects"
 
 // [optional] declare the repositories your project relies on.
 dependencyResolutionManagement {

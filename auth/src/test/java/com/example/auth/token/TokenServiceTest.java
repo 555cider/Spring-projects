@@ -1,4 +1,4 @@
-package com.example.auth.api;
+package com.example.auth.token;
 
 import com.example.auth.common.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,7 @@ import reactor.test.StepVerifier;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class TokenServiceTest {
 
     @Mock
     private AuthRepository authRepository;
@@ -22,7 +22,7 @@ class AuthServiceTest {
     private TokenRepository tokenRepository;
 
     @InjectMocks
-    private AuthService authService;
+    private TokenService tokenService;
 
     @BeforeEach
     void setUp() {
@@ -36,21 +36,21 @@ class AuthServiceTest {
     @Test
     public void testLogin_ValidCredentials_ReturnsLoginResponse() {
         // Given
-        LoginRequest loginRequest = new LoginRequest("test1@example.com", "password1");
+        CreateTokenRequest loginRequest = new CreateTokenRequest("test1@example.com", "password1");
         Auth auth = new Auth(1L, loginRequest.getEmail(), loginRequest.getPassword());
         Long tokenId = 1L;
-        LoginResponse loginResponse = new LoginResponse(tokenId);
+        CreateTokenResponse tokenPostResponse = new CreateTokenResponse(tokenId);
         when(authRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())).thenReturn(Mono.just(auth));
         when(tokenRepository.saveWithAuthId(auth.id())).thenReturn(Mono.just(tokenId));
 
         // When
-        Mono<LoginResponse> loginResponseMono = authService.login(loginRequest);
+        Mono<CreateTokenResponse> loginResponseMono = tokenService.createToken(loginRequest);
 
         // Then
         StepVerifier
                 .create(loginResponseMono)
                 .expectSubscription()
-                .thenConsumeWhile(loginResponse::equals)
+                .thenConsumeWhile(tokenPostResponse::equals)
                 .expectComplete()
                 .verify();
     }
@@ -61,19 +61,19 @@ class AuthServiceTest {
     @Test
     public void testLogin_InvalidCredentials_ThrowsGlobalException() {
         // Given
-        LoginRequest loginRequest = new LoginRequest("invalid@example.com", "wrongpassword");
-        LoginResponse loginResponse = new LoginResponse().withCode("9952").withMessage("Invalid email or password");
+        CreateTokenRequest loginRequest = new CreateTokenRequest("invalid@example.com", "wrongpassword");
+        CreateTokenResponse tokenPostResponse = new CreateTokenResponse().withCode("9952").withMessage("Invalid email or password");
         when(authRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())).thenReturn(Mono.empty());
 
         // When
-        Mono<LoginResponse> loginResponseMono = authService.login(loginRequest);
+        Mono<CreateTokenResponse> loginResponseMono = tokenService.createToken(loginRequest);
 
         // Then
         StepVerifier
                 .create(loginResponseMono)
                 .expectErrorMatches(error -> error instanceof GlobalException
-                        && loginResponse.getCode().equals((((GlobalException) error).getCode()))
-                        && loginResponse.getMessage().equals(error.getMessage()))
+                        && tokenPostResponse.getCode().equals((((GlobalException) error).getCode()))
+                        && tokenPostResponse.getMessage().equals(error.getMessage()))
                 .verify();
     }
 
