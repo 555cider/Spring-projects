@@ -1,7 +1,27 @@
-# current
+# common
 spring:
   profiles:
     active: local
+  application:
+    name: auth-service
+  messages:
+    basename: messages
+  r2dbc:
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 60000
+      max-lifetime: 180000
+      max-create-connection-time: 2s
+server:
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
 
 ---
 # local
@@ -15,8 +35,15 @@ spring:
     password: 1234
     properties:
       schema: temp
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jws-algorithms: RS512
+          issuer-uri: http://127.0.0.1:{server.port}/issuer
+          jwk-set-uri: http://127.0.0.1:{server.port}/.well-known/jwks.json
 server:
-  port: 8082
+  port: 9000
 eureka:
   instance:
     hostname: localhost
@@ -44,27 +71,3 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
-
----
-# common
-spring:
-  application:
-    name: auth-service
-  messages:
-    basename: messages
-  r2dbc:
-    pool:
-      initial-size: 5
-      max-size: 10
-      max-idle-time: 60000
-      max-lifetime: 180000
-      max-create-connection-time: 2s
-server:
-  shutdown: graceful
-  netty:
-    connection-timeout: 2s
-    idle-timeout: 15s
-eureka:
-  client:
-    registerWithEureka: true
-    fetchRegistry: true

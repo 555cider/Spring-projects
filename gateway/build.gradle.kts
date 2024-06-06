@@ -26,20 +26,18 @@ dependencies {
 
     // Gateway
     implementation("org.springframework.cloud:spring-cloud-starter-gateway:${springCloudVersion}")
-    // Reactive Redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:${springBootVersion}")
     // Security
     implementation("org.springframework.boot:spring-boot-starter-security:${springBootVersion}")
 
-    // R2DBC
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:${springBootVersion}")
-    // R2DBC Postgresql
-    implementation("org.postgresql:r2dbc-postgresql:${r2dbcPostgresqlVersion}")
+    // OAuth
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:${springBootVersion}")
 
-    // JWT
-    implementation("io.jsonwebtoken:jjwt-api:${jjwtVersion}")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${jjwtVersion}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${jjwtVersion}")
+    // DB - Reactive Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:${springBootVersion}")
+    // DB - R2DBC
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:${springBootVersion}")
+    // DB - R2DBC Postgresql
+    implementation("org.postgresql:r2dbc-postgresql:${r2dbcPostgresqlVersion}")
 
     // encrypt secrets
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")

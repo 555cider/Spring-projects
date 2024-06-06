@@ -1,7 +1,64 @@
-# current
+# common
 spring:
   profiles:
     active: local
+  application:
+    name: gateway
+  messages:
+    basename: messages
+  cloud:
+    gateway:
+      default-filters:
+        - name: LogFilter
+      routes:
+        - id: auth_service_route
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+          filters:
+            - name: RewritePath
+              args:
+                regexp: /auth/?(?<segment>.*)
+                replacement: /$\{segment}
+            - name: RequestSize
+              args:
+                maxSize: 5000000
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter:
+                  replenishRate: 5
+                  burstCapacity: 5
+                  requestedTokens: 1
+                key-resolver: "#{@myKeyResolver}"
+      redis-rate-limiter:
+        include-headers: false
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 10s
+      x-forwarded:
+        for-enabled: false
+        host-enabled: false
+        port-enabled: false
+        proto-enabled: false
+        prefix-enabled: false
+  data:
+    redis:
+      time-to-live: 3600000
+  r2dbc:
+    max-idle-time: 60000
+    max-lifetime: 180000
+    max-create-connection-time: 2s
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+hibernate:
+  cache:
+    use-second-level-cache: true
+service:
+  jwt:
+    access-expiration: 3600000
+    skip-path-regex: .*/public/.*, ^/login$, ^/token$
 
 ---
 # local
@@ -81,64 +138,3 @@ service:
   api:
     auth:
       base-path: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
-
----
-# common
-spring:
-  application:
-    name: gateway
-  messages:
-    basename: messages
-  cloud:
-    gateway:
-      default-filters:
-        - name: LogFilter
-      routes:
-        - id: auth_service_route
-          uri: lb://AUTH-SERVICE
-          predicates:
-            - Path=/auth/**
-          filters:
-            - name: RewritePath
-              args:
-                regexp: /auth/?(?<segment>.*)
-                replacement: /$\{segment}
-            - name: RequestSize
-              args:
-                maxSize: 5000000
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter:
-                  replenishRate: 5
-                  burstCapacity: 5
-                  requestedTokens: 1
-                key-resolver: "#{@myKeyResolver}"
-      redis-rate-limiter:
-        include-headers: false
-      httpclient:
-        connect-timeout: 10000
-        response-timeout: 10s
-      x-forwarded:
-        for-enabled: false
-        host-enabled: false
-        port-enabled: false
-        proto-enabled: false
-        prefix-enabled: false
-  data:
-    redis:
-      time-to-live: 3600000
-  r2dbc:
-      max-idle-time: 60000
-      max-lifetime: 180000
-      max-create-connection-time: 2s
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-hibernate:
-  cache:
-    use-second-level-cache: true
-service:
-  jwt:
-    access-expiration: 3600000
-    skip-path-regex: .*/public/.*, ^/login$, ^/token$

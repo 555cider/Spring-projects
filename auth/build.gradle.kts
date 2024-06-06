@@ -26,7 +26,9 @@ dependencies {
     // Web
     implementation("org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}")
     implementation("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
-
+    implementation("org.springframework.boot:spring-boot-starter-security:${springBootVersion}")
+    // OAuth2
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server:${springBootVersion}")
     // R2DBC
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:${springBootVersion}")
     // R2DBC Postgresql
