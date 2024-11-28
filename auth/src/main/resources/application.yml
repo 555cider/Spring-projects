@@ -1,9 +1,9 @@
 # common
 spring:
-  profiles:
-    active: local
   application:
-    name: auth-service
+    name: auth
+  main:
+    allow-bean-definition-overriding: true
   messages:
     basename: messages
   r2dbc:
@@ -23,25 +23,12 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
 
+logging:
+  level:
+    root: debug
+
 ---
 # local
-spring:
-  config:
-    activate:
-      on-profile: local
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
-    username: postgres
-    password: 1234
-    properties:
-      schema: temp
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jws-algorithms: RS512
-          issuer-uri: http://127.0.0.1:{server.port}/issuer
-          jwk-set-uri: http://127.0.0.1:{server.port}/.well-known/jwks.json
 server:
   port: 9000
 eureka:
@@ -49,10 +36,48 @@ eureka:
     hostname: localhost
   client:
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:8761/eureka
+      defaultZone: "http://${eureka.instance.hostname}:8761/eureka"
+spring:
+  config:
+    activate:
+      on-profile: local
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:9000/.well-known/jwks.json"
+          issuer-uri: "http://localhost:9000"
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/my_db?serverTimezone=Asia/Seoul
+    username: postgres
+    password: 1234
+    properties:
+      schema: my_schema
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+# JWT 설정
+jwt:
+  # JWT Secret Key 설정 (안전한 값으로 변경 필요)
+  secret: [ JWT_SECRET_KEY ]
+  # Access Token 만료 시간 (초 단위)
+  access-token-validity-seconds: 3600
+  # Refresh Token 만료 시간 (초 단위)
+  refresh-token-validity-seconds: 2592000
 
 ---
 # dev
+server:
+  port: ${SERVICE_AUTH_PORT}
+eureka:
+  instance:
+    hostname: ${DISCOVERY_HOST}
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
 spring:
   config:
     activate:
@@ -63,11 +88,3 @@ spring:
     password: ${POSTGRES_PASSWORD}
     properties:
       schema: ${POSTGRES_SCHEMA}
-server:
-  port: ${SERVICE_AUTH_PORT}
-eureka:
-  instance:
-    hostname: ${DISCOVERY_HOST}
-  client:
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka

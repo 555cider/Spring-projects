@@ -7,18 +7,19 @@ group = "com.example"
 version = "0.0.1"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 val springBootVersion by extra { "3.2.5" }
 val springCloudVersion by extra { "4.1.1" }
 val r2dbcPostgresqlVersion by extra { "1.0.4.RELEASE" }
-val postgresqlVersion by extra { "42.7.3" }
-val jjwtVersion by extra { "0.12.5" }
 
 dependencies {
     // Eureka Client

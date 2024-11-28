@@ -2,6 +2,8 @@ package com.example.gateway.util;
 
 import com.example.gateway.common.BaseException;
 import io.netty.channel.ChannelOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
@@ -16,10 +18,10 @@ import java.util.Map;
 @Component
 public class ApiUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiUtil.class);
     private static final HttpClient httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000)
             .responseTimeout(Duration.ofMillis(3000));
-
     private static final WebClient webClient = WebClient
             .builder()
             .clientConnector(new ReactorClientHttpConnector(httpClient))

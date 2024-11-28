@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # PostgreSQL Database (https://hub.docker.com/_/postgres)
+  # PostgreSQL Database
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -11,8 +11,10 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT_DOCKER}"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
   # Redis Cache
   redis:
     container_name: redis
@@ -57,5 +59,20 @@ services:
     depends_on:
       - discovery
       - postgres
+      - redis
+  client:
+    container_name: client
+    build: client
+    env_file:
+      - .env
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT_DOCKER}"
+    depends_on:
+      - discovery
+      - postgres
+      - redis
+      - auth
 volumes:
   postgres-data:

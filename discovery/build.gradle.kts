@@ -6,11 +6,18 @@ plugins {
 group = "com.example"
 version = "0.0.1"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
-val springCloudVersion = "4.1.1"
+val springCloudVersion by extra { "4.1.1" }
 
 dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:${springCloudVersion}")

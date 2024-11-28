@@ -11,8 +11,8 @@ spring:
       default-filters:
         - name: LogFilter
       routes:
-        - id: auth_service_route
-          uri: lb://AUTH-SERVICE
+        - id: route_auth
+          uri: lb://AUTH
           predicates:
             - Path=/auth/**
           filters:
@@ -26,8 +26,8 @@ spring:
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter:
-                  replenishRate: 5
-                  burstCapacity: 5
+                  replenishRate: 100
+                  burstCapacity: 100
                   requestedTokens: 1
                 key-resolver: "#{@myKeyResolver}"
       redis-rate-limiter:
@@ -62,6 +62,13 @@ service:
 
 ---
 # local
+server:
+  port: 8080
+eureka:
+  instance:
+    hostname: localhost
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka
 spring:
   config:
     activate:
@@ -84,20 +91,20 @@ spring:
   security:
     user:
       password: 1234
-server:
-  port: 8080
-eureka:
-  instance:
-    hostname: localhost
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:8761/eureka
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: 'http://localhost:9000'
+          jws-algorithms: 'RS512'
+          jwk-set-uri: 'http://localhost:9000/.well-known/jwks.json'
+#          public-key-location: classpath:my-public-key.pub
 service:
   jwt:
     private-key: keys/jwt-private_pkcs8.pem
     public-key: keys/jwt-public.pem
   api:
     auth:
-      base-path: http://localhost:8082/auth # lb://AUTH-SERVICE/auth
+      base-path: 'lb://AUTH-SERVICE/auth'
 
 ---
 # dev

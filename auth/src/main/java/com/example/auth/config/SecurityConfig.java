@@ -1,76 +1,84 @@
 package com.example.auth.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManagerAdapter;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 
-@Configuration
+@Import(OAuth2AuthorizationServerConfiguration.class)
 @EnableWebFluxSecurity
+@Configuration
 public class SecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuerUri;
+    private final UserDetailsService userDetailsService;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String tokenEndpoint;
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String tokenIntrospectionEndpoint;
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String tokenRevocationEndpoint;
-
-    /**
-     * A Spring Security filter chain for the OAuth2 core components and protocol endpoints.
-     *
-     * @see <a href="https://docs.spring.io/spring-authorization-server/reference/core-model-components.html">Core Components</a>
-     * @see <a href="https://docs.spring.io/spring-authorization-server/reference/protocol-endpoints.html">Protocol Endpoints</a>
-     */
-    @Bean
-    @Order(1)
-
-    public SecurityFilterChain oauthSecurityFilterChain(HttpSecurity http)
-            throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                // .registeredClientRepository(registeredClientRepository) // (REQUIRED) => ClientConfig
-                // .authorizationService(authorizationService) // => AuthorizationServerConfig
-                .authorizationServerSettings(authorizationServerSettings()) // (REQUIRED)
-                // .tokenGenerator(tokenGenerator) // => TokenConfig
-        ;
-        return http.build();
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
-    // A Spring Security filter chain for authentication.
+    @Order(1)
     @Bean
-    @Order(2)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityWebFilterChain authorizationServerSecurityFilterChain(ServerHttpSecurity http) {
         return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/oauth2/**"))
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/oauth2/authorization", "/oauth2/consent", "/oauth2/token").permitAll()
+                        .anyExchange().authenticated())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+//                .formLogin(Customizer.withDefaults())
+                .build();
+    }
+
+    @Order(2)
+    @Bean
+    public SecurityWebFilterChain defaultSecurityFilterChain(ServerHttpSecurity http) {
+        return http
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/.well-known/jwks.json", "/.well-known/openid-configuration").permitAll()
+                        .anyExchange().authenticated())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .formLogin(Customizer.withDefaults())
                 .build();
     }
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer(issuerUri)
-                .tokenEndpoint("/oauth2/v1/token")
-                .tokenIntrospectionEndpoint("/oauth2/v1/introspect")
-                .tokenRevocationEndpoint("/oauth2/v1/revoke")
-                .jwkSetEndpoint("/oauth2/v1/jwks")
+                .issuer("http://localhost:9000")
+                .authorizationEndpoint("/oauth2/authorization")
                 .build();
+    }
+
+    @Bean
+    public ReactiveAuthenticationManager reactiveAuthenticationManager() {
+        return new ReactiveAuthenticationManagerAdapter(new ProviderManager(daoAuthenticationProvider()));
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }

@@ -3,7 +3,7 @@
 
     <!-- # Variables -->
     <springProperty scope="context" name="springAppName" source="spring.application.name"/>
-    <property name="LOG_DIR_PATH" value="./logs"/>
+    <property name="LOG_DIR_PATH" value="../logs"/>
     <property name="LOG_PATTERN" value="%d{HH:mm:ss.SSS} %-5level [%thread] %logger{16} - %msg%n"/>
 
     <!-- # Appenders (https://logback.qos.ch/manual/appenders.html)  -->

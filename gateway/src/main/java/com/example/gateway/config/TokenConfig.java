@@ -9,8 +9,7 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
-import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import reactor.core.publisher.Mono;
@@ -27,14 +26,17 @@ public class TokenConfig {
     private String jwtIssuer;
 
     @Bean
-    public NimbusReactiveJwtDecoder jwtDecoder() {
-        return NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri).jwsAlgorithm(SignatureAlgorithm.RS512).build();
+    public OAuth2TokenValidator<Jwt> tokenValidator() {
+        List<OAuth2TokenValidator<Jwt>> validators = List.of(JwtValidators.createDefaultWithIssuer(jwtIssuer));
+        return new DelegatingOAuth2TokenValidator<>(validators);
     }
 
     @Bean
-    public OAuth2TokenValidator<Jwt> tokenValidator() {
-        List<OAuth2TokenValidator<Jwt>> validators = List.of(new JwtTimestampValidator(), new JwtIssuerValidator(jwtIssuer));
-        return new DelegatingOAuth2TokenValidator<>(validators);
+    public NimbusReactiveJwtDecoder jwtDecoder() {
+        return NimbusReactiveJwtDecoder
+                .withIssuerLocation(issuerUri)
+                .jwsAlgorithm(SignatureAlgorithm.RS512)
+                .build();
     }
 
     @Bean
