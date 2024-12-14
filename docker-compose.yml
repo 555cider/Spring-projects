@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # PostgreSQL Database (https://hub.docker.com/_/postgres)
+  # PostgreSQL Database
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -11,8 +11,10 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT_DOCKER}"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
   # Redis Cache
   redis:
     container_name: redis
@@ -30,6 +32,7 @@ services:
       - .env
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
+#    hostname: "${DISCOVERY_HOST}"
     ports:
       - "${DISCOVERY_PORT}:${DISCOVERY_PORT_DOCKER}"
   # API Gateway
@@ -40,6 +43,7 @@ services:
       - .env
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
+#    hostname: "${GATEWAY_HOST}"
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT_DOCKER}"
     depends_on:
@@ -52,10 +56,29 @@ services:
       - .env
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
+#    hostname: "${AUTH_HOST}"
     ports:
-      - "${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT_DOCKER}"
+      - "${AUTH_PORT}:${AUTH_PORT_DOCKER}"
     depends_on:
-      - discovery
       - postgres
+      - redis
+      - discovery
+      - gateway
+  # Client Service
+  client:
+    container_name: client
+    build: client
+    env_file:
+      - .env
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT_DOCKER}"
+    network_mode: "host"
+    depends_on:
+      - postgres
+      - redis
+      - auth
+
 volumes:
   postgres-data:

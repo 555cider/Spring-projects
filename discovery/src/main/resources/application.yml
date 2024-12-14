@@ -1,7 +1,15 @@
-# current
+# common
 spring:
-  profiles:
-    active: local
+  application:
+    name: discovery
+eureka:
+  instance:
+    lease-expiration-duration-in-seconds: 30
+  server:
+    eviction-interval-timer-in-ms: 5000
+  client:
+    register-with-eureka: false
+    fetch-registry: false
 
 ---
 # local
@@ -14,6 +22,9 @@ server:
 eureka:
   instance:
     hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 ---
 # dev
@@ -26,15 +37,6 @@ server:
 eureka:
   instance:
     hostname: ${DISCOVERY_HOST}
-
----
-# common
-spring:
-  application:
-    name: discovery
-eureka:
   client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+    service-url:
+      defaultZone: ${DISCOVERY_BASE_URL}/eureka/

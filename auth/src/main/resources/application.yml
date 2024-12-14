@@ -1,28 +1,35 @@
-# current
-spring:
-  profiles:
-    active: local
-
----
 # local
 spring:
   config:
     activate:
       on-profile: local
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/auth/.well-known/jwks.json
+          issuer-uri: http://localhost:8080/auth
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/example?serverTimezone=Asia/Seoul
+    url: r2dbc:postgresql://localhost:5432/my_db?serverTimezone=Asia/Seoul
     username: postgres
     password: 1234
     properties:
-      schema: temp
+      schema: my_schema
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
 server:
-  port: 8082
+  port: 9000
+
 eureka:
   instance:
     hostname: localhost
   client:
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:8761/eureka
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
 
 ---
 # dev
@@ -30,26 +37,41 @@ spring:
   config:
     activate:
       on-profile: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_ISSUER_URI}/.well-known/jwks.json
+          issuer-uri: ${AUTH_ISSUER_URI}
   r2dbc:
     url: r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?serverTimezone=Asia/Seoul
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     properties:
       schema: ${POSTGRES_SCHEMA}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      database: 0
+
 server:
-  port: ${SERVICE_AUTH_PORT}
+  port: ${AUTH_PORT}
+
 eureka:
   instance:
-    hostname: ${DISCOVERY_HOST}
+    prefer-ip-address: true
   client:
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${DISCOVERY_PORT}/eureka
+    service-url:
+      defaultZone: ${DISCOVERY_BASE_URL}/eureka/
 
 ---
 # common
 spring:
   application:
-    name: auth-service
+    name: auth
+  main:
+    allow-bean-definition-overriding: true
   messages:
     basename: messages
   r2dbc:
@@ -59,12 +81,18 @@ spring:
       max-idle-time: 60000
       max-lifetime: 180000
       max-create-connection-time: 2s
+
 server:
   shutdown: graceful
   netty:
     connection-timeout: 2s
     idle-timeout: 15s
+
 eureka:
   client:
-    registerWithEureka: true
-    fetchRegistry: true
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    root: debug

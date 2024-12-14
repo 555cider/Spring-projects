@@ -1,34 +1,47 @@
 package com.example.auth.common;
 
+import org.springframework.http.HttpStatus;
+
 public class GlobalException extends Throwable {
 
-    private String code;
+    private int code;
 
     private String message;
 
     private Exception exception;
 
-    public GlobalException(String code) {
+    public GlobalException(int code) {
         this.code = code;
     }
 
-    public GlobalException(String code, String message) {
+    public GlobalException(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public GlobalException(String code, Exception exception) {
+    public GlobalException(int code, Exception exception) {
         this.code = code;
         this.exception = exception;
     }
 
-    public GlobalException(String code, String message, Exception exception) {
+    public GlobalException(int code, String message, Exception exception) {
         this.code = code;
         this.message = message;
         this.exception = exception;
     }
 
-    public String getCode() {
+    public GlobalException(HttpStatus httpStatus) {
+        this.code = httpStatus.value();
+        this.message = httpStatus.getReasonPhrase();
+    }
+
+    public GlobalException(HttpStatus httpStatus, Exception exception) {
+        this.code = httpStatus.value();
+        this.message = httpStatus.getReasonPhrase();
+        this.exception = exception;
+    }
+
+    public int getCode() {
         return code;
     }
 

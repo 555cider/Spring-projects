@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse> handleGlobalException(GlobalException ex, Locale locale) {
         String message;
         if (ex.getMessage() == null || "".equals(ex.getMessage())) {
-            message = messageSource.getMessage(ex.getCode(), null, locale);
+            message = messageSource.getMessage(String.valueOf(ex.getCode()), null, locale);
         } else {
             message = ex.getLocalizedMessage();
         }

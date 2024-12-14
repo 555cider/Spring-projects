@@ -5,14 +5,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
+import java.net.InetSocketAddress;
 
 @Configuration
 public class RateLimitConfig {
 
     @Bean
     KeyResolver myKeyResolver() {
-        return exchange -> Mono.just(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress());
+        return exchange -> {
+            InetSocketAddress address = exchange.getRequest().getRemoteAddress();
+            if (address == null) {
+                return Mono.empty();
+            }
+            return Mono.just(address.getAddress().getHostAddress());
+        };
     }
 
 }
